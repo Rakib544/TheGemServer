@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 
 const app = express();
 app.use(cors());
@@ -15,8 +16,29 @@ app.get('/', (req, res) => {
 })
 
 client.connect(err => {
-    const foodCollection = client.db(`${process.env.DB_NAME}`).collection("devices");
-    console.log('database connected')
+    const foodCollection = client.db(`${process.env.DB_NAME}`).collection("Foods");
+    
+    app.post('/addFood', (req, res) => {
+      foodCollection.insertOne(req.body)
+      .then(result => {
+        res.send(result.insertedCount > 0);
+      })
+    })
+
+    app.get('/foods', (req, res) => {
+      foodCollection.find({})
+      .toArray((err, foods) => {
+        res.send(foods)
+      })
+    })
+
+    app.delete('/deleteFood', (req, res) => {
+      foodCollection.deleteOne({_id: ObjectID(req.body.id)})
+      .then(result => {
+        res.send(result.deletedCount > 0)
+      })
+    })
+
   });
   
   
