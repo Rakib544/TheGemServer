@@ -39,6 +39,13 @@ client.connect(err => {
       })
     })
 
+    app.get('/singleFood/:id', (req, res) => {
+      foodCollection.find({_id: ObjectID(req.params.id) })
+      .toArray((err, food) => {
+        res.send(food[0])
+      })
+    })
+
   });
   
   
